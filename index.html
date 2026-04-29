@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Password</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111111;
+            display: grid;
+            place-items: center;
+        }
+
+        main {
+            width: 20rem;
+            margin: 2rem 0 0 0;
+        }
+
+        div {
+            display: grid;
+            grid-template-columns: auto 6rem;
+        }
+
+        input,
+        textarea,
+        button {
+            box-sizing: border-box;
+            display: inline-block;
+            height: 2.75rem;
+            width: 100%;
+            max-width: 100%;
+            margin: 0.5rem 0 0.5rem 0;
+            padding: 0 1rem 0 1rem;
+            font-size: 1rem;
+            line-height: 2.75rem;
+            border-style: none;
+            outline: none;
+            resize: none;
+            vertical-align: middle;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        input,
+        textarea {
+            background-color: #333333;
+            font-family: "Noto Sans Mono", monospace;
+        }
+
+        input {
+            border-radius: 0.8125rem;
+        }
+
+        textarea {
+            border-radius: 0.8125rem 0 0 0.8125rem;
+        }
+
+        button {
+            border-radius: 0 0.8125rem 0.8125rem 0;
+            background-color: #3969ef;
+            font-family: "Noto Sans", sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <input id="inputText" type="text" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"
+            autofocus>
+        <div>
+            <textarea id="outputText" readonly></textarea>
+            <button id="copyButton">Copy</button>
+        </div>
+    </main>
+
+    <script>
+        const inputEl = document.getElementById('inputText');
+        const outputEl = document.getElementById('outputText');
+        const copyBtn = document.getElementById('copyButton');
+
+        async function computeSha256Base64Url(text) {
+            const enc = new TextEncoder();
+            const data = enc.encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const bytes = new Uint8Array(hashBuffer);
+            const binary = String.fromCharCode(...bytes);
+            let hashB64 = btoa(binary);
+            hashB64 = hashB64.replace(/[^A-Za-z0-9]/g, '');
+            return hashB64;
+        }
+
+        let latestToken = null;
+
+        inputEl.addEventListener('input', async () => {
+            const inputValue = inputEl.value || '';
+            const requestToken = Symbol();
+            latestToken = requestToken;
+            if (inputValue === '') {
+                if (latestToken === requestToken) {
+                    outputEl.value = '';
+                    copyBtn.disabled = true;
+                }
+                return;
+            }
+            try {
+                const hashB64 = await computeSha256Base64Url(inputValue);
+                if (latestToken === requestToken) {
+                    outputEl.value = hashB64.slice(0, 20);
+                    copyBtn.disabled = !outputEl.value;
+                }
+            } catch (e) {
+                outputEl.value = '';
+                copyBtn.disabled = true;
+            }
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            const clipboardText = (outputEl.value || '').slice(0, 10);
+            if (!clipboardText) return;
+            try {
+                await navigator.clipboard.writeText(clipboardText);
+                copyBtn.textContent = 'Copied';
+            } catch {
+                copyBtn.textContent = 'Failed';
+            }
+            setTimeout(() => copyBtn.textContent = 'Copy', 1000);
+        });
+
+        copyBtn.disabled = !outputEl.value;
+    </script>
+</body>
+
+</html>
