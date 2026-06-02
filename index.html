@@ -5,10 +5,25 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Password</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+Mono&display=swap" rel="stylesheet">
+    <link rel="preload" href="NotoSansMono-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+    <link rel="preload" href="NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <style>
+        @font-face {
+            font-family: "Noto Sans Mono";
+            src: url("NotoSansMono-Regular.ttf") format("truetype");
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: "Noto Sans";
+            src: url("NotoSans-Regular.ttf") format("truetype");
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
         body {
             background-color: #111111;
             display: grid;
@@ -63,7 +78,8 @@
 
         button {
             border-radius: 0 0.8125rem 0.8125rem 0;
-            background-color: #3969ef;
+            background-color: #75b6eb;
+            color: #01142d;
             font-family: "Noto Sans", sans-serif;
         }
     </style>
